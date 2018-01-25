@@ -6,6 +6,64 @@
 import random
 import math
 
+
+
+
+class Node:
+    def __init__(self):
+        self.val = val
+        self.edges = []
+
+    def __eq__(self, other):
+        return self.val == other.val
+
+        # Used for finding the collision chain for this node.
+
+    def __hash__(self):
+        return self.val
+
+
+class Graph:
+    def __init__(self, nodes=[]):
+        self.nodes = nodes
+
+    def add_node(self, val):
+        new_node = Node(val)
+        self.nodes.append(new_node)
+
+    def add_edge(self, node1, node2):
+        node1.edges.append(node2)
+        node2.edges.append(node1)
+
+    def bfs(self):
+        if not self.nodes:
+            return []
+        start = self.nodes[0]
+        visited, queue, result = set([start]), deque([start]), []
+        while queue:
+            node = queue.popleft()
+            result.append(node)
+            for nd in node.edges:
+                if nd not in visited:
+                    queue.append(nd)
+                    visited.add(nd)
+        return result
+
+    def dfs(self):
+        if not self.nodes:
+            return []
+        start = self.nodes[0]
+        visited, stack, result = set([start]), [start], []
+        while stack:
+            node = stack.pop()
+            result.append(node)
+            for nd in node.edges:
+                if nd not in visited:
+                    stack.append(nd)
+                    visited.add(nd)
+        return result
+
+
 class Floor(object):
 
     def __init__(self):
@@ -20,6 +78,7 @@ class Floor(object):
         for i in range(self.Rooms):
             self.RoomTemps.append(random.randint(self.minTemp, self.maxTemp))
             self.RoomHumid.append(random.randint(self.minHumid, self.maxHumid))
+
 
 
     def printRooms(self):
@@ -61,6 +120,9 @@ class Floor(object):
     def decreaseHumid(self, room):
         if (self.RoomHumid[room-1] > self.minHumid):
             self.RoomHumid[room-1] = self.RoomHumid[room-1] - 1
+
+
+
 
 class Robot(object):
 
