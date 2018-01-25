@@ -31,9 +31,11 @@ class Graph:
         new_node = Node(office)
         self.nodes.append(new_node)
 
-    def add_edge(self, node1, node2):
-        node1.edges.append(node2)
-        node2.edges.append(node1)
+    def add_edge(self, node1, node2, weight):
+        node1.edges.append([node2, weight])
+        node2.edges.append([node1, weight])
+
+
 
     def bfs(self):
         if not self.nodes:
@@ -72,12 +74,21 @@ class Floor(object):
         self.RoomHumid = []
         self.minTemp  = 65; self.maxTemp  = 75
         self.minHumid = 45; self.maxHumid = 55
+        self.graph = Graph()
         self.initRooms()
+
 
     def initRooms(self):
         for i in range(self.Rooms):
             self.RoomTemps.append(random.randint(self.minTemp, self.maxTemp))
             self.RoomHumid.append(random.randint(self.minHumid, self.maxHumid))
+
+    def initGraph(self):
+        for i in range(self.Rooms):
+            self.graph.add_node(i).append(random.randint(self.minTemp, self.maxTemp))
+            self.RoomHumid.append(random.randint(self.minHumid, self.maxHumid))
+
+
 
 
 
