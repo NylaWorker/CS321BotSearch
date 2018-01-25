@@ -27,11 +27,11 @@ class Graph:
     def __init__(self, nodes=[]):
         self.nodes = nodes
 
-    def add_node(self, office):
-        new_node = Node(office)
-        self.nodes.append(new_node)
+    def addNode(self, office):
+        newNode = Node(office)
+        self.nodes.append(newNode)
 
-    def add_edge(self, node1, node2, weight):
+    def addEdge(self, node1, node2, weight):
         node1.edges.append([node2, weight])
         node2.edges.append([node1, weight])
 
@@ -92,22 +92,22 @@ class Floor(object):
 
     def initGraph(self):
         for i in range(self.Rooms+1):
-            self.graph.add_node(i)
+            self.graph.addNode(i)
 
-        graph.add_edge(graph.nodes[1],  graph.nodes[2],  13)
-        graph.add_edge(graph.nodes[1],  graph.nodes[3],  15)
-        graph.add_edge(graph.nodes[2],  graph.nodes[4],  7)
-        graph.add_edge(graph.nodes[3],  graph.nodes[7],  23)
-        graph.add_edge(graph.nodes[4],  graph.nodes[5],  6)
-        graph.add_edge(graph.nodes[4],  graph.nodes[6],  10)
-        graph.add_edge(graph.nodes[4],  graph.nodes[9],  16)
-        graph.add_edge(graph.nodes[5],  graph.nodes[8],  4)
-        graph.add_edge(graph.nodes[6],  graph.nodes[7],  9)
-        graph.add_edge(graph.nodes[7],  graph.nodes[10], 17)
-        graph.add_edge(graph.nodes[8],  graph.nodes[9],  5)
-        graph.add_edge(graph.nodes[9],  graph.nodes[10], 8)
-        graph.add_edge(graph.nodes[10], graph.nodes[11], 2)
-        graph.add_edge(graph.nodes[11], graph.nodes[12], 19)
+        self.graph.addEdge(self.graph.nodes[1],  self.graph.nodes[2],  13)
+        self.graph.addEdge(self.graph.nodes[1],  self.graph.nodes[3],  15)
+        self.graph.addEdge(self.graph.nodes[2],  self.graph.nodes[4],  7)
+        self.graph.addEdge(self.graph.nodes[3],  self.graph.nodes[7],  23)
+        self.graph.addEdge(self.graph.nodes[4],  self.graph.nodes[5],  6)
+        self.graph.addEdge(self.graph.nodes[4],  self.graph.nodes[6],  10)
+        self.graph.addEdge(self.graph.nodes[4],  self.graph.nodes[9],  16)
+        self.graph.addEdge(self.graph.nodes[5],  self.graph.nodes[8],  4)
+        self.graph.addEdge(self.graph.nodes[6],  self.graph.nodes[7],  9)
+        self.graph.addEdge(self.graph.nodes[7],  self.graph.nodes[10], 17)
+        self.graph.addEdge(self.graph.nodes[8],  self.graph.nodes[9],  5)
+        self.graph.addEdge(self.graph.nodes[9],  self.graph.nodes[10], 8)
+        self.graph.addEdge(self.graph.nodes[10], self.graph.nodes[11], 2)
+        self.graph.addEdge(self.graph.nodes[11], self.graph.nodes[12], 19)
 
 
 
