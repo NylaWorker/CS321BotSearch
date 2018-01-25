@@ -156,11 +156,11 @@ class Floor(object):
 
 class Robot(object):
 
-    def __init__(self, curRoom = 1):
+    def __init__(self):
         self.floor = Floor()
         self.floor.printRooms()
 
-        self.curRoom = curRoom
+        self.curRoom = random.randint(1, self.floor.Rooms)
         self.GoalTemp  = 72; self.TempDev  = 1.5
         self.GoalHumid = 47; self.HumidDev = 1.75
 
