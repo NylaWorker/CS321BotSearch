@@ -41,7 +41,10 @@ class Graph:
         if not self.nodes:
             return []
         start = self.nodes[0]
-        visited, queue, result = set([start]), deque([start]), []
+        visited= set([start])
+        queue = deque([start])
+        result = []
+
         while queue:
             node = queue.popleft()
             result.append(node)
@@ -55,7 +58,10 @@ class Graph:
         if not self.nodes:
             return []
         start = self.nodes[0]
-        visited, stack, result = set([start]), [start], []
+        visited = set([start])
+        stack = [start]
+        result = []
+        
         while stack:
             node = stack.pop()
             result.append(node)
@@ -85,8 +91,23 @@ class Floor(object):
             self.RoomHumid.append(random.randint(self.minHumid, self.maxHumid))
 
     def initGraph(self):
-        for i in range(self.Rooms):
+        for i in range(self.Rooms+1):
             self.graph.add_node(i)
+
+        graph.add_edge(graph.nodes[1],  graph.nodes[2],  13)
+        graph.add_edge(graph.nodes[1],  graph.nodes[3],  15)
+        graph.add_edge(graph.nodes[2],  graph.nodes[4],  7)
+        graph.add_edge(graph.nodes[3],  graph.nodes[7],  23)
+        graph.add_edge(graph.nodes[4],  graph.nodes[5],  6)
+        graph.add_edge(graph.nodes[4],  graph.nodes[6],  10)
+        graph.add_edge(graph.nodes[4],  graph.nodes[9],  16)
+        graph.add_edge(graph.nodes[5],  graph.nodes[8],  4)
+        graph.add_edge(graph.nodes[6],  graph.nodes[7],  9)
+        graph.add_edge(graph.nodes[7],  graph.nodes[10], 17)
+        graph.add_edge(graph.nodes[8],  graph.nodes[9],  5)
+        graph.add_edge(graph.nodes[9],  graph.nodes[10], 8)
+        graph.add_edge(graph.nodes[10], graph.nodes[11], 2)
+        graph.add_edge(graph.nodes[11], graph.nodes[12], 19)
 
 
 
