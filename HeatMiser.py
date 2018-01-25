@@ -11,24 +11,24 @@ import math
 
 class Node:
     def __init__(self):
-        self.val = val
+        self.office = office
         self.edges = []
 
     def __eq__(self, other):
-        return self.val == other.val
+        return self.office == other.office
 
         # Used for finding the collision chain for this node.
 
     def __hash__(self):
-        return self.val
+        return self.office
 
 
 class Graph:
     def __init__(self, nodes=[]):
         self.nodes = nodes
 
-    def add_node(self, val):
-        new_node = Node(val)
+    def add_node(self, office):
+        new_node = Node(office)
         self.nodes.append(new_node)
 
     def add_edge(self, node1, node2):
@@ -127,66 +127,66 @@ class Floor(object):
 class Robot(object):
 
     def __init__(self, curRoom = 1):
-        self.Floor = Floor()
-        self.Floor.printRooms()
+        self.floor = Floor()
+        self.floor.printRooms()
 
-        self.CurRoom = curRoom
+        self.curRoom = curRoom
         self.GoalTemp  = 72; self.TempDev  = 1.5
         self.GoalHumid = 47; self.HumidDev = 1.75
 
     def curRoom(self):
-        return self.CurRoom
+        return self.curRoom
 
     def nextRoom(self):
-        self.CurRoom = (self.curRoom() % 12) + 1
+        self.curRoom = (self.curRoom() % 12) + 1
 
     def isTempGood(self):
-        avg = self.Floor.getAvgTemperature()
-        dev = math.floor(self.Floor.getStdDevTemperature()*10)/10    # Round to tenths place
+        avg = self.floor.getAvgTemperature()
+        dev = math.floor(self.floor.getStdDevTemperature()*10)/10    # Round to tenths place
         if ((self.GoalTemp <= avg < self.GoalTemp + 1) and dev <= self.TempDev):
             return True
         else:
             return False
 
     def isHumidGood(self):
-        avg = self.Floor.getAvgHumidity()
-        dev = math.floor(self.Floor.getStdDevHumidity()*100)/100     # Round to hundredths place
+        avg = self.floor.getAvgHumidity()
+        dev = math.floor(self.floor.getStdDevHumidity()*100)/100     # Round to hundredths place
         if ((self.GoalHumid <= avg < self.GoalHumid + 1) and dev <= self.HumidDev):
             return True
         else:
             return False
 
     def changeTemp(self, room):
-        if (self.Floor.getStdDevTemperature() > self.TempDev):
-            if (self.Floor.getTemperature(room) <= self.GoalTemp):
-                self.Floor.increaseTemp(room)
+        if (self.floor.getStdDevTemperature() > self.TempDev):
+            if (self.floor.getTemperature(room) <= self.GoalTemp):
+                self.floor.increaseTemp(room)
                 print('Increasing temperature.')
             else:
-                self.Floor.decreaseTemp(room)
+                self.floor.decreaseTemp(room)
                 print('Decreasing temperature.')
         else:
-            if (self.Floor.getAvgTemperature() <= self.GoalTemp):
-                self.Floor.increaseTemp(room)
+            if (self.floor.getAvgTemperature() <= self.GoalTemp):
+                self.floor.increaseTemp(room)
                 print('Increasing temperature.')
             else:
-                self.Floor.decreaseTemp(room)
+                self.floor.decreaseTemp(room)
                 print('Decreasing temperature.')
 
 
     def changeHumid(self, room):
-        if (self.Floor.getStdDevHumidity() > self.HumidDev):
-            if (self.Floor.getHumidity(room) < self.GoalHumid):
-                self.Floor.increaseHumid(room)
+        if (self.floor.getStdDevHumidity() > self.HumidDev):
+            if (self.floor.getHumidity(room) < self.GoalHumid):
+                self.floor.increaseHumid(room)
                 print('Increasing humidity.')
             else:
-                self.Floor.decreaseHumid(room)
+                self.floor.decreaseHumid(room)
                 print('Decreasing humidity.')
         else:
-            if (self.Floor.getAvgHumidity() < self.GoalHumid):
-                self.Floor.increaseHumid(room)
+            if (self.floor.getAvgHumidity() < self.GoalHumid):
+                self.floor.increaseHumid(room)
                 print('Increasing humidity.')
             else:
-                self.Floor.decreaseHumid(room)
+                self.floor.decreaseHumid(room)
                 print('Decreasing humidity.')
 
 
@@ -214,12 +214,12 @@ def runSimulation():
         visits += 1
         room = robot.curRoom()
         print('Office {}: {} degrees, {}% humidity'
-                .format(room, robot.Floor.getTemperature(room), robot.Floor.getHumidity(room)))
+                .format(room, robot.floor.getTemperature(room), robot.floor.getHumidity(room)))
 
         
         # Figure out which factor to change
-        tempDelta = abs(robot.GoalTemp - robot.Floor.getTemperature(room))
-        humidDelta = abs(robot.GoalHumid - robot.Floor.getHumidity(room))
+        tempDelta = abs(robot.GoalTemp - robot.floor.getTemperature(room))
+        humidDelta = abs(robot.GoalHumid - robot.floor.getHumidity(room))
 
         if (robot.isTempGood()):
             robot.changeHumid(room)
@@ -231,10 +231,10 @@ def runSimulation():
             robot.changeTemp(room)
 
 
-        temp = robot.Floor.getAvgTemperature()
-        humid = robot.Floor.getAvgHumidity()
-        stdTemp = robot.Floor.getStdDevTemperature()
-        stdHumid = robot.Floor.getStdDevHumidity()
+        temp = robot.floor.getAvgTemperature()
+        humid = robot.floor.getAvgHumidity()
+        stdTemp = robot.floor.getStdDevTemperature()
+        stdHumid = robot.floor.getStdDevHumidity()
         
         print('The average is {:.2f} degrees ({:.2f} deviation)'
                 ' and {:.2f}% humidity ({:.2f} deviation).\n'
@@ -245,7 +245,7 @@ def runSimulation():
 
     # Simulation over, print results
     print('Finished simulation:')
-    robot.Floor.printRooms()
+    robot.floor.printRooms()
 
     print('The average is {:.2f} degrees ({:.2f} deviation)'
             ' and {:.2f}% humidity ({:.2f} deviation).'
