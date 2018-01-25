@@ -10,7 +10,7 @@ import math
 
 
 class Node:
-    def __init__(self):
+    def __init__(self, office):
         self.office = office
         self.edges = []
 
@@ -76,6 +76,7 @@ class Floor(object):
         self.minHumid = 45; self.maxHumid = 55
         self.graph = Graph()
         self.initRooms()
+        self.initGraph()
 
 
     def initRooms(self):
@@ -85,10 +86,7 @@ class Floor(object):
 
     def initGraph(self):
         for i in range(self.Rooms):
-            self.graph.add_node(i).append(random.randint(self.minTemp, self.maxTemp))
-            self.RoomHumid.append(random.randint(self.minHumid, self.maxHumid))
-
-
+            self.graph.add_node(i)
 
 
 
@@ -145,11 +143,11 @@ class Robot(object):
         self.GoalTemp  = 72; self.TempDev  = 1.5
         self.GoalHumid = 47; self.HumidDev = 1.75
 
-    def curRoom(self):
-        return self.curRoom
+    # def curRoom(self):
+    #     return self.curRoom
 
     def nextRoom(self):
-        self.curRoom = (self.curRoom() % 12) + 1
+        self.curRoom = (self.curRoom % 12) + 1
 
     def isTempGood(self):
         avg = self.floor.getAvgTemperature()
@@ -223,7 +221,7 @@ def runSimulation():
 
     while ((not robot.isTempGood()) or (not robot.isHumidGood())):
         visits += 1
-        room = robot.curRoom()
+        room = robot.curRoom
         print('Office {}: {} degrees, {}% humidity'
                 .format(room, robot.floor.getTemperature(room), robot.floor.getHumidity(room)))
 
