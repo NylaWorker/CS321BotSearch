@@ -7,8 +7,6 @@ import random
 import math
 
 
-
-
 class Node:
     def __init__(self, office):
         self.office = office
@@ -36,12 +34,11 @@ class Graph:
         node2.edges.append([node1, weight])
 
 
-
-    def bfs(self):
+    def bfs(self, curRoom, goalRoom):
         if not self.nodes:
             return []
-        start = self.nodes[0]
-        visited= set([start])
+        start = self.nodes[curRoom]
+        visited = set([start])
         queue = deque([start])
         result = []
 
@@ -54,10 +51,10 @@ class Graph:
                     visited.add(nd)
         return result
 
-    def dfs(self):
+    def dfs(self, curRoom, goalRoom):
         if not self.nodes:
             return []
-        start = self.nodes[0]
+        start = self.nodes[curRoom]
         visited = set([start])
         stack = [start]
         result = []
@@ -152,8 +149,6 @@ class Floor(object):
             self.RoomHumid[room-1] = self.RoomHumid[room-1] - 1
 
 
-
-
 class Robot(object):
 
     def __init__(self):
@@ -163,9 +158,6 @@ class Robot(object):
         self.curRoom = random.randint(1, self.floor.Rooms)
         self.GoalTemp  = 72; self.TempDev  = 1.5
         self.GoalHumid = 47; self.HumidDev = 1.75
-
-    # def curRoom(self):
-    #     return self.curRoom
 
     def nextRoom(self):
         self.curRoom = (self.curRoom % 12) + 1
