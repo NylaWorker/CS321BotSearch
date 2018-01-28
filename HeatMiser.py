@@ -221,6 +221,12 @@ class Floor(object):
         if (self.RoomHumid[room-1] > self.minHumid):
             self.RoomHumid[room-1] = self.RoomHumid[room-1] - 1
 
+    def setTemp(self, room):
+        self.RoomTemps[room - 1] = 72
+
+    def setHumid(self, room):
+        self.RoomTemps[room - 1] = 47
+
 
 class Robot(object):
 
@@ -257,34 +263,34 @@ class Robot(object):
     def changeTemp(self, room):
         if (self.floor.getStdDevTemperature() > self.TempDev):
             if (self.floor.getTemperature(room) <= self.GoalTemp):
-                self.floor.increaseTemp(room)
+                self.floor.setTemp(room)
                 print('Increasing temperature.')
             else:
-                self.floor.decreaseTemp(room)
+                self.floor.setTemp(room)
                 print('Decreasing temperature.')
         else:
             if (self.floor.getAvgTemperature() <= self.GoalTemp):
-                self.floor.increaseTemp(room)
+                self.floor.setTemp(room)
                 print('Increasing temperature.')
             else:
-                self.floor.decreaseTemp(room)
+                self.floor.setTemp(room)
                 print('Decreasing temperature.')
 
 
     def changeHumid(self, room):
         if (self.floor.getStdDevHumidity() > self.HumidDev):
             if (self.floor.getHumidity(room) < self.GoalHumid):
-                self.floor.increaseHumid(room)
+                self.floor.setHumid(room)
                 print('Increasing humidity.')
             else:
-                self.floor.decreaseHumid(room)
+                self.floor.setHumid(room)
                 print('Decreasing humidity.')
         else:
             if (self.floor.getAvgHumidity() < self.GoalHumid):
-                self.floor.increaseHumid(room)
+                self.floor.setHumid(room)
                 print('Increasing humidity.')
             else:
-                self.floor.decreaseHumid(room)
+                self.floor.setHumid(room)
                 print('Decreasing humidity.')
 
 
