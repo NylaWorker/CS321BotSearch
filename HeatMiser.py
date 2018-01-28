@@ -13,7 +13,9 @@ class Node:
     def __init__(self, office):
         self.office = office
         self.edges = []
+        # [4, 7]
         self.weights = []
+        # [10, 9]
 
     def __eq__(self, other):
         return self.office == other.office
@@ -45,18 +47,20 @@ class Graph:
         node2.weights.append(weight)
 
 
-    def bfs(self, curRoom, goalRoom):
-        if not self.nodes[curRoom]:
+    def bfs(self, startRoom, goalRoom):
+        if not self.nodes[startRoom]:
             return []
-        start = self.nodes[curRoom]
+        start = self.nodes[startRoom]
         visited = set() #[start])
         queue = deque([start])
         result = []
         path = []
+        pathWeights = []
 
         for i in range(13):
             path.append(0)
-        path[curRoom] = -1
+            pathWeights.append(0)
+        path[startRoom] = -1
 
         # print([room for room in path])
 
@@ -66,20 +70,40 @@ class Graph:
             if node not in visited:
                 result.append(node)
                 visited.add(node)
-            # result.append(node)
-            for curNode in node.edges:
-                # print("Testing:", curNode)
-                if curNode not in visited:
-                    queue.append(curNode)
-                    path[curNode.office] = node.office
-                    # print("Adding:", curNode)
-                    # visited.add(curNode)
+                # result.append(node)
+                # for curNode in node.edges:
+                for i in range(len(node.edges)):
+                    curNode = node.edges[i]
+                    # print("Testing:", curNode)
+                    if curNode not in visited:
+                        queue.append(curNode)
+                        if path[curNode.office] == 0:
+                            path[curNode.office] = node.office
+                            pathWeights[curNode.office] = node.weights[i]
+                        # print("Adding:", curNode, "child of", node.office)
+                        # visited.add(curNode)
 
         # testGraph
         # path
         print([room for room in path])
+        print([weight for weight in pathWeights])
 
-        return result
+        numJumps = 0
+        pathWeight = 0
+        pathFound = False
+        curRoom = goalRoom
+
+        while not pathFound:
+            if curRoom == startRoom:
+                pathFound = True;
+            else:
+                pathWeight += pathWeights[curRoom]
+                numJumps += 1
+                curRoom = path[curRoom]
+
+        print("numVisits:", numJumps, "pathWeight:", pathWeight)
+        return [numJumps, pathWeight]
+        # return result
 
     def dfs(self, curRoom, goalRoom):
         if not self.nodes[curRoom]:
@@ -155,7 +179,7 @@ class Floor(object):
         self.graph.addEdge(self.graph.nodes[11], self.graph.nodes[12], 19)
 
     def testGraph(self):
-        result = self.graph.bfs(6, 1)
+        result = self.graph.bfs(3, 9)
         # print(type(result))
         print([x for x in result])
 
@@ -163,7 +187,7 @@ class Floor(object):
         #     print(node.office, ": ", [edge.office for edge in node.edges])
 
 
-        result = self.graph.dfs(5, 1)
+        result = self.graph.dfs(3, 9)
         # print(type(result))
         print([x for x in result])
         # for x in result:
