@@ -85,8 +85,8 @@ class Graph:
 
         # testGraph
         # path
-        print([room for room in path])
-        print([weight for weight in pathWeights])
+        # print([room for room in path])
+        # print([weight for weight in pathWeights])
 
         numJumps = 0
         pathWeight = 0
@@ -101,7 +101,7 @@ class Graph:
                 numJumps += 1
                 curRoom = path[curRoom]
 
-        print("numVisits:", numJumps, "pathWeight:", pathWeight)
+        # print("numVisits:", numJumps, "pathWeight:", pathWeight)
         return [numJumps, pathWeight]
         # return result
 
@@ -151,7 +151,7 @@ class Floor(object):
         self.graph = Graph()
         self.initRooms()
         self.initGraph()
-        self.testGraph()
+        # self.testGraph()
 
 
     def initRooms(self):
@@ -248,6 +248,9 @@ class Robot(object):
     def nextRoom(self):
         self.curRoom = (self.curRoom % 12) + 1
 
+    def setRoom(self, room):
+        self.curRoom = room
+
     def isTempGood(self):
         avg = self.floor.getAvgTemperature()
         dev = math.floor(self.floor.getStdDevTemperature()*10)/10    # Round to tenths place
@@ -317,12 +320,46 @@ def runSimulation():
     temp  = 0; stdTemp  = 0;
     humid = 0; stdHumid = 0;
     visits = 0
+    # pathJumps = []
+    # pathWeights = []
+    totalJumps = 0
+    totalWeights = 0
 
-    while (False): # ((not robot.isTempGood()) or (not robot.isHumidGood())):
+    loop = True
+    while (loop): # ((not robot.isTempGood()) or (not robot.isHumidGood())):
+        loop = False
+
+
+        # Search for room to change:
+        maxDelta = 0
+        maxDeltaRoom = 0
+        for i in range(len(robot.floor.RoomHumid)):
+            if abs(robot.GoalHumid - robot.floor.RoomHumid[i]) > maxDelta:
+                maxDelta = abs(robot.GoalHumid - robot.floor.RoomHumid[i])
+                maxDeltaRoom = i+1
+        for i in range(len(robot.floor.RoomTemps)):
+            if abs(robot.GoalTemp - robot.floor.RoomTemps[i]) > maxDelta:
+                maxDelta = abs(robot.GoalTemp - robot.floor.RoomTemps[i])
+                maxDeltaRoom = i+1
+
+        # print("curRoom:", robot.curRoom)
+        # print("Room to change:", maxDeltaRoom)
+
+
+
+        [numJumps, pathWeight] = robot.floor.graph.bfs(robot.curRoom, maxDeltaRoom)
+        # print(robot.curRoom, maxDeltaRoom, numJumps, pathWeight)
+        # pathJumps.append(numJumps)
+        # pathWeights.append(pathWeight)
+        totalJumps += numJumps
+        totalWeights += pathWeight
+
+        print('Starting in room {}, going to room {} in {} jumps, using {} power'
+                .format(robot.curRoom, maxDeltaRoom, numJumps, pathWeight))
+
+        robot.setRoom(maxDeltaRoom)
+        room = maxDeltaRoom
         visits += 1
-        room = robot.curRoom
-        print('Office {}: {} degrees, {}% humidity'
-                .format(room, robot.floor.getTemperature(room), robot.floor.getHumidity(room)))
 
         
         # Figure out which factor to change
@@ -338,6 +375,8 @@ def runSimulation():
         else:
             robot.changeTemp(room)
 
+        print('Office {}: {} degrees, {}% humidity'
+                .format(room, robot.floor.getTemperature(room), robot.floor.getHumidity(room)))
 
         temp = robot.floor.getAvgTemperature()
         humid = robot.floor.getAvgHumidity()
@@ -348,7 +387,7 @@ def runSimulation():
                 ' and {:.2f}% humidity ({:.2f} deviation).\n'
                 .format(temp, stdTemp, humid, stdHumid))
 
-        robot.nextRoom()
+        # robot.nextRoom()
 
 
     # Simulation over, print results
@@ -359,15 +398,20 @@ def runSimulation():
     #         ' and {:.2f}% humidity ({:.2f} deviation).'
     #         .format(temp, stdTemp, humid, stdHumid))
 
-    return visits
+    return [visits, totalJumps, totalWeights]
 
 
 def main():
     numVisits = []
+    numJumps = []
+    numWeights = []
     for i in range(1):
         print('Simulation {}:'.format(i+1))
-        visits = runSimulation()
+        [visits, totalJumps, totalWeights] = runSimulation()
         numVisits.append(visits)
+        numJumps.append(totalJumps)
+        numWeights.append(totalWeights)
+
         print('It took {} total visits.'.format(visits))
         print()
 
