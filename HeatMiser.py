@@ -225,7 +225,7 @@ class Floor(object):
         self.RoomTemps[room - 1] = 72
 
     def setHumid(self, room):
-        self.RoomTemps[room - 1] = 47
+        self.RoomHumid[room - 1] = 47
 
 
 class Robot(object):
@@ -261,37 +261,39 @@ class Robot(object):
             return False
 
     def changeTemp(self, room):
-        if (self.floor.getStdDevTemperature() > self.TempDev):
-            if (self.floor.getTemperature(room) <= self.GoalTemp):
-                self.floor.setTemp(room)
-                print('Increasing temperature.')
-            else:
-                self.floor.setTemp(room)
-                print('Decreasing temperature.')
-        else:
-            if (self.floor.getAvgTemperature() <= self.GoalTemp):
-                self.floor.setTemp(room)
-                print('Increasing temperature.')
-            else:
-                self.floor.setTemp(room)
-                print('Decreasing temperature.')
+        self.floor.setTemp(room)
+        # if (self.floor.getStdDevTemperature() > self.TempDev):
+        #     if (self.floor.getTemperature(room) <= self.GoalTemp):
+        #         self.floor.setTemp(room)
+        #         print('Increasing temperature.')
+        #     else:
+        #         self.floor.setTemp(room)
+        #         print('Decreasing temperature.')
+        # else:
+        #     if (self.floor.getAvgTemperature() <= self.GoalTemp):
+        #         self.floor.setTemp(room)
+        #         print('Increasing temperature.')
+        #     else:
+        #         self.floor.setTemp(room)
+        #         print('Decreasing temperature.')
 
 
     def changeHumid(self, room):
-        if (self.floor.getStdDevHumidity() > self.HumidDev):
-            if (self.floor.getHumidity(room) < self.GoalHumid):
-                self.floor.setHumid(room)
-                print('Increasing humidity.')
-            else:
-                self.floor.setHumid(room)
-                print('Decreasing humidity.')
-        else:
-            if (self.floor.getAvgHumidity() < self.GoalHumid):
-                self.floor.setHumid(room)
-                print('Increasing humidity.')
-            else:
-                self.floor.setHumid(room)
-                print('Decreasing humidity.')
+        self.floor.setHumid(room)
+    #     if (self.floor.getStdDevHumidity() > self.HumidDev):
+    #         if (self.floor.getHumidity(room) < self.GoalHumid):
+    #             self.floor.setHumid(room)
+    #             print('Increasing humidity.')
+    #         else:
+    #             self.floor.setHumid(room)
+    #             print('Decreasing humidity.')
+    #     else:
+    #         if (self.floor.getAvgHumidity() < self.GoalHumid):
+    #             self.floor.setHumid(room)
+    #             print('Increasing humidity.')
+    #         else:
+    #             self.floor.setHumid(room)
+    #             print('Decreasing humidity.')
 
 
 def calculateStdDev(array):
