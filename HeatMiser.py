@@ -232,7 +232,7 @@ class Robot(object):
 
     def __init__(self):
         self.floor = Floor()
-        # self.floor.printRooms()
+        self.floor.printRooms()
 
         self.curRoom = random.randint(1, self.floor.Rooms)
         self.GoalTemp  = 72; self.TempDev  = 1.5
@@ -321,21 +321,26 @@ def runSimulation():
     totalWeights = 0
 
     loop = True
-    while (loop): # ((not robot.isTempGood()) or (not robot.isHumidGood())):
-        loop = False
+    while ((not robot.isTempGood()) or (not robot.isHumidGood())):
+        # loop = False
+        # if visits == 3:
+        #     break
 
 
         # Search for room to change:
         maxDelta = 0
         maxDeltaRoom = 0
-        for i in range(len(robot.floor.RoomHumid)):
-            if abs(robot.GoalHumid - robot.floor.RoomHumid[i]) > maxDelta:
-                maxDelta = abs(robot.GoalHumid - robot.floor.RoomHumid[i])
-                maxDeltaRoom = i+1
-        for i in range(len(robot.floor.RoomTemps)):
-            if abs(robot.GoalTemp - robot.floor.RoomTemps[i]) > maxDelta:
-                maxDelta = abs(robot.GoalTemp - robot.floor.RoomTemps[i])
-                maxDeltaRoom = i+1
+        if (not robot.isTempGood()):
+            for i in range(len(robot.floor.RoomTemps)):
+                if abs(robot.GoalTemp - robot.floor.RoomTemps[i]) > maxDelta:
+                    maxDelta = abs(robot.GoalTemp - robot.floor.RoomTemps[i])
+                    maxDeltaRoom = i+1
+        if (not robot.isHumidGood()):
+            for i in range(len(robot.floor.RoomHumid)):
+                if abs(robot.GoalHumid - robot.floor.RoomHumid[i]) > maxDelta:
+                    maxDelta = abs(robot.GoalHumid - robot.floor.RoomHumid[i])
+                    maxDeltaRoom = i+1
+
 
         # print("curRoom:", robot.curRoom)
         # print("Room to change:", maxDeltaRoom)
@@ -360,6 +365,9 @@ def runSimulation():
         # Figure out which factor to change
         tempDelta = abs(robot.GoalTemp - robot.floor.getTemperature(room))
         humidDelta = abs(robot.GoalHumid - robot.floor.getHumidity(room))
+
+        print('Office {}: {} degrees, {}% humidity'
+                .format(room, robot.floor.getTemperature(room), robot.floor.getHumidity(room)))
 
         if (robot.isTempGood()):
             robot.changeHumid(room)
@@ -386,12 +394,12 @@ def runSimulation():
 
 
     # Simulation over, print results
-    # print('Finished simulation:')
-    # robot.floor.printRooms()
+    print('Finished simulation:')
+    robot.floor.printRooms()
 
-    # print('The average is {:.2f} degrees ({:.2f} deviation)'
-    #         ' and {:.2f}% humidity ({:.2f} deviation).'
-    #         .format(temp, stdTemp, humid, stdHumid))
+    print('The average is {:.2f} degrees ({:.2f} deviation)'
+            ' and {:.2f}% humidity ({:.2f} deviation).'
+            .format(temp, stdTemp, humid, stdHumid))
 
     return [visits, totalJumps, totalWeights]
 
@@ -400,7 +408,7 @@ def main():
     numVisits = []
     numJumps = []
     numWeights = []
-    for i in range(1):
+    for i in range(100):
         print('Simulation {}:'.format(i+1))
         [visits, totalJumps, totalWeights] = runSimulation()
         numVisits.append(visits)
