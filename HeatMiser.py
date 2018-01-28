@@ -23,9 +23,11 @@ class Node:
     def __hash__(self):
         return self.office
 
-    def __str__(self):
-        return str(self.office)
+    # def __str__(self):
+    #     return str(self.office)
 
+    def __repr__(self):
+        return str(self.office)
 
 class Graph:
     def __init__(self, nodes=[]):
@@ -50,17 +52,33 @@ class Graph:
         visited = set() #[start])
         queue = deque([start])
         result = []
+        path = []
+
+        for i in range(13):
+            path.append(0)
+        path[curRoom] = -1
+
+        # print([room for room in path])
 
         while queue:
+            # print("Next round:")
             node = queue.popleft()
             if node not in visited:
                 result.append(node)
                 visited.add(node)
             # result.append(node)
             for curNode in node.edges:
+                # print("Testing:", curNode)
                 if curNode not in visited:
                     queue.append(curNode)
+                    path[curNode.office] = node.office
+                    # print("Adding:", curNode)
                     # visited.add(curNode)
+
+        # testGraph
+        # path
+        print([room for room in path])
+
         return result
 
     def dfs(self, curRoom, goalRoom):
@@ -137,19 +155,19 @@ class Floor(object):
         self.graph.addEdge(self.graph.nodes[11], self.graph.nodes[12], 19)
 
     def testGraph(self):
-        result = self.graph.bfs(1, 1)
+        result = self.graph.bfs(6, 1)
         # print(type(result))
-        for x in result:
-            print(x.office)
+        print([x for x in result])
 
         # for node in self.graph.nodes:
         #     print(node.office, ": ", [edge.office for edge in node.edges])
 
 
         result = self.graph.dfs(5, 1)
-        print(type(result))
-        for x in result:
-            print(x.office)
+        # print(type(result))
+        print([x for x in result])
+        # for x in result:
+        #     print(x.office)
 
 
     def printRooms(self):
@@ -310,12 +328,12 @@ def runSimulation():
 
 
     # Simulation over, print results
-    print('Finished simulation:')
+    # print('Finished simulation:')
     # robot.floor.printRooms()
 
-    print('The average is {:.2f} degrees ({:.2f} deviation)'
-            ' and {:.2f}% humidity ({:.2f} deviation).'
-            .format(temp, stdTemp, humid, stdHumid))
+    # print('The average is {:.2f} degrees ({:.2f} deviation)'
+    #         ' and {:.2f}% humidity ({:.2f} deviation).'
+    #         .format(temp, stdTemp, humid, stdHumid))
 
     return visits
 
