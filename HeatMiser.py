@@ -1,16 +1,19 @@
-# @Martin Green, @Nyla Worker
+# @Martin Green
+# @Nyla Worker
 # HeatMiser.py
 # AI HW 2
 # Winter 2018
 
 import random
 import math
+from collections import deque
 
 
 class Node:
     def __init__(self, office):
         self.office = office
         self.edges = []
+        self.weights = []
 
     def __eq__(self, other):
         return self.office == other.office
@@ -19,6 +22,9 @@ class Node:
 
     def __hash__(self):
         return self.office
+
+    def __str__(self):
+        return str(self.office)
 
 
 class Graph:
@@ -30,43 +36,66 @@ class Graph:
         self.nodes.append(newNode)
 
     def addEdge(self, node1, node2, weight):
-        node1.edges.append([node2, weight])
-        node2.edges.append([node1, weight])
+        node1.edges.append(node2)
+        node1.weights.append(weight)
+
+        node2.edges.append(node1)
+        node2.weights.append(weight)
 
 
     def bfs(self, curRoom, goalRoom):
-        if not self.nodes:
+        if not self.nodes[curRoom]:
             return []
         start = self.nodes[curRoom]
-        visited = set([start])
+        visited = set() #[start])
         queue = deque([start])
         result = []
 
         while queue:
             node = queue.popleft()
-            result.append(node)
-            for nd in node.edges:
-                if nd not in visited:
-                    queue.append(nd)
-                    visited.add(nd)
+            if node not in visited:
+                result.append(node)
+                visited.add(node)
+            # result.append(node)
+            for curNode in node.edges:
+                if curNode not in visited:
+                    queue.append(curNode)
+                    # visited.add(curNode)
         return result
 
     def dfs(self, curRoom, goalRoom):
-        if not self.nodes:
+        if not self.nodes[curRoom]:
             return []
         start = self.nodes[curRoom]
-        visited = set([start])
+        visited = set() #[start])
         stack = [start]
         result = []
         
         while stack:
+            # print("Stack:", [office.office for office in stack])
+            # print("Visited:", [office.office for office in visited])
             node = stack.pop()
-            result.append(node)
-            for nd in node.edges:
-                if nd not in visited:
-                    stack.append(nd)
-                    visited.add(nd)
+            if node not in visited:
+                result.append(node)
+                visited.add(node)
+            # print("Cur node:", node) # [edge.office for edge in node.edges]
+
+            for curNode in node.edges:
+                if curNode not in visited:
+                    stack.append(curNode)
         return result
+
+    def dfs_paths(self, curRoom, goalRoom):
+        stack = [(curRoom, [curRoom])]
+        while stack:
+            (vertex, path) = stack.pop()
+            for next in self[vertex] - set(path):
+                if next == goalRoom:
+                    yield path + [next]
+                else:
+                    stack.append((next, path + [next]))
+
+# list(dfs_paths(graph, 'A', 'F')) # [['A', 'C', 'F'], ['A', 'B', 'E', 'F']]
 
 
 class Floor(object):
@@ -80,6 +109,7 @@ class Floor(object):
         self.graph = Graph()
         self.initRooms()
         self.initGraph()
+        self.testGraph()
 
 
     def initRooms(self):
@@ -106,6 +136,20 @@ class Floor(object):
         self.graph.addEdge(self.graph.nodes[10], self.graph.nodes[11], 2)
         self.graph.addEdge(self.graph.nodes[11], self.graph.nodes[12], 19)
 
+    def testGraph(self):
+        result = self.graph.bfs(1, 1)
+        # print(type(result))
+        for x in result:
+            print(x.office)
+
+        # for node in self.graph.nodes:
+        #     print(node.office, ": ", [edge.office for edge in node.edges])
+
+
+        result = self.graph.dfs(5, 1)
+        print(type(result))
+        for x in result:
+            print(x.office)
 
 
     def printRooms(self):
@@ -153,7 +197,7 @@ class Robot(object):
 
     def __init__(self):
         self.floor = Floor()
-        self.floor.printRooms()
+        # self.floor.printRooms()
 
         self.curRoom = random.randint(1, self.floor.Rooms)
         self.GoalTemp  = 72; self.TempDev  = 1.5
@@ -232,7 +276,7 @@ def runSimulation():
     humid = 0; stdHumid = 0;
     visits = 0
 
-    while ((not robot.isTempGood()) or (not robot.isHumidGood())):
+    while (False): # ((not robot.isTempGood()) or (not robot.isHumidGood())):
         visits += 1
         room = robot.curRoom
         print('Office {}: {} degrees, {}% humidity'
@@ -267,7 +311,7 @@ def runSimulation():
 
     # Simulation over, print results
     print('Finished simulation:')
-    robot.floor.printRooms()
+    # robot.floor.printRooms()
 
     print('The average is {:.2f} degrees ({:.2f} deviation)'
             ' and {:.2f}% humidity ({:.2f} deviation).'
@@ -278,7 +322,7 @@ def runSimulation():
 
 def main():
     numVisits = []
-    for i in range(100):
+    for i in range(1):
         print('Simulation {}:'.format(i+1))
         visits = runSimulation()
         numVisits.append(visits)
