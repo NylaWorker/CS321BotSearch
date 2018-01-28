@@ -2,6 +2,14 @@ Sunday:
 finish first part --> get buggy code done -- test that bfs
 write introduction
 
+get weights --> and figure out how to store it until we get ther
+add ground work how to trace the path back.
+Changing that to when it gets to the goal
+
+Next step:
+search for which roomst to change the most?
+
+
 Tuesday:
 get started with heuristics and analysis // bring my cheat sheet to compare.
 
@@ -11,3 +19,7 @@ meet 5 work until 7 7:30 - inf: on finshing heuristic and write up.
 
 Friday:
 from 7 to midnight just in case
+
+
+Baby write up:
+https://www.overleaf.com/13460425wcsvstdrmwtb
