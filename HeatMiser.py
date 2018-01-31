@@ -129,9 +129,16 @@ class Graph:
                     stack.append(curNode)
         return result
 
+    # def findHeuristic(self, curRoom, goalRoom, heuristic, desiredout = "in"):
+    #     i = 0
+    #     while curRoom != heuristic[11*i][0]:
+    #         print(dog_)
+    #      print(i+1)
+    #
+    # # def Astar(self, heuristic, startRoom, goalRoom):
+    # #
+    # #     while a
 
-
-    #def Astar(self, heuristic, ):
 
 class Floor(object):
 
@@ -436,9 +443,11 @@ def main():
         heuristic = [line.strip().split('\t') for line in tsv]
         #print(heuristic)
         newheuristic = []
+
         for i in range(len(heuristic)):
-            newheuristic.append(list(filter(None, heuristic[i])))
-        newheuristic = newheuristic[1:]
+            if i > 0:
+                newheuristic.append(list(map(int,list(filter(None, heuristic[i])))))
+        newheuristic = newheuristic ##[initial off, end off, straight line distance]
         print(newheuristic)
 
 
