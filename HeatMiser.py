@@ -7,6 +7,8 @@
 import random
 import math
 from collections import deque
+import re
+import csv
 
 
 class Node:
@@ -427,8 +429,17 @@ def main():
     print('Overall, it took an average of {} visits ({:.2f} deviation).\n'
             .format(meanVisits, stdDevVisits))
 
-    heuristic = open("HeatMiserHeuristic.txt","r")
-    print(heuristic.read())
+    heuristic = open("HeatMiserHeuristic.txt","r").read().splitlines(True)
+    #print(heuristic)
+
+    with open('HeatMiserHeuristic.txt', 'r') as tsv:
+        heuristic = [line.strip().split('\t') for line in tsv]
+        #print(heuristic)
+        newheuristic = []
+        for i in range(len(heuristic)):
+            newheuristic.append(list(filter(None, heuristic[i])))
+        newheuristic = newheuristic[1:]
+        print(newheuristic)
 
 
 main()
