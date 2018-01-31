@@ -127,6 +127,10 @@ class Graph:
                     stack.append(curNode)
         return result
 
+
+
+    #def Astar(self, heuristic, ):
+
 class Floor(object):
 
     def __init__(self):
@@ -414,5 +418,9 @@ def main():
     meanVisits = sum(numVisits)/len(numVisits)
     print('Overall, it took an average of {} visits ({:.2f} deviation).\n'
             .format(meanVisits, stdDevVisits))
+
+    heuristic = open("HeatMiserHeuristic.txt","r")
+    print(heuristic.read())
+
 
 main()
