@@ -12,6 +12,20 @@ import csv
 
 heuristic = []  # Global heuristic list for each run of simulation
 
+import heapq
+
+class PriorityQueue:
+    def __init__(self):
+        self.elements = []
+    
+    def empty(self):
+        return len(self.elements) == 0
+    
+    def put(self, item, priority):
+        heapq.heappush(self.elements, (priority, item))
+    
+    def get(self):
+        return heapq.heappop(self.elements)[1]
 
 class Node:
     def __init__(self, office):
@@ -127,6 +141,55 @@ class Graph:
                     stack.append(curNode)
         return result
 
+    def a_star_search(self, startRoom, goal):
+        frontier = PriorityQueue()
+        start = self.nodes[startRoom]
+        frontier.put(start, 0)
+        came_from = {}
+        cost_so_far = {}
+        came_from[start] = 0
+        cost_so_far[start] = 0
+        
+        while not frontier.empty():
+            current = frontier.get()
+            
+            if current.office == goal:
+                break
+            
+                    # for i in range(len(node.edges)):
+                        # curNode = node.edges[i]
+            # for next in graph.neighbors(current):
+            # for next in current.edges:
+            for i in range(len(current.edges)):
+                next = current.edges[i]
+                # new_cost = cost_so_far[current] + graph.cost(current, next)
+                new_cost = cost_so_far[current] + current.weights[i]
+                if next not in cost_so_far or new_cost < cost_so_far[next]:
+                    cost_so_far[next] = new_cost
+                    # print(current, next, goal)
+                    # print(type(current), type(next), type(goal))
+                    priority = new_cost + findHeuristicWeight(next.office, goal, heuristic)
+                    frontier.put(next, priority)
+                    came_from[next] = current
+        
+        return came_from, cost_so_far
+
+        # numJumps = 0
+        # pathWeight = 0
+        # pathFound = False
+        # curRoom = goalRoom
+
+        # while not pathFound:
+        #     if curRoom == startRoom:
+        #         pathFound = True;
+        #     else:
+        #         pathWeight += pathWeights[curRoom]
+        #         numJumps += 1
+        #         curRoom = path[curRoom]
+
+        # # print("numVisits:", numJumps, "pathWeight:", pathWeight)
+        # return [numJumps, pathWeight]
+
 
 class Floor(object):
 
@@ -139,7 +202,7 @@ class Floor(object):
         self.graph = Graph()
         self.initRooms()
         self.initGraph()
-        # self.testGraph()
+        self.testGraph()
 
 
     def initRooms(self):
@@ -167,19 +230,21 @@ class Floor(object):
         self.graph.addEdge(self.graph.nodes[11], self.graph.nodes[12], 19)
 
     def testGraph(self):
-        result = self.graph.bfs(3, 9)
+        # result = self.graph.bfs(3, 9)
         # print(type(result))
-        print([x for x in result])
+        # print([x for x in result])
 
         # for node in self.graph.nodes:
         #     print(node.office, ": ", [edge.office for edge in node.edges])
 
 
-        result = self.graph.dfs(3, 9)
+        # result = self.graph.dfs(3, 9)
         # print(type(result))
-        print([x for x in result])
+        # print([x for x in result])
         # for x in result:
         #     print(x.office)
+
+        print(self.graph.a_star_search(4, 9))
 
 
     def printRooms(self):
@@ -233,7 +298,7 @@ class Robot(object):
 
     def __init__(self):
         self.floor = Floor()
-        self.floor.printRooms()
+        # self.floor.printRooms()
 
         self.curRoom = random.randint(1, self.floor.Rooms)
         self.GoalTemp  = 72; self.TempDev  = 1.5
@@ -313,7 +378,8 @@ def calculateStdDev(array):
 
 def findHeuristicWeight(curRoom, goalRoom,  heuristic):
     if goalRoom == curRoom:
-        print("ERROR: Goal room should not equal current room")
+        return 0
+        # print("ERROR: Goal room should not equal current room")
     else:
         #               find curRoom    then go to goalRoom     and adjust for offset
         return heuristic[(curRoom-1)*11 + goalRoom - (2 if goalRoom > curRoom else 1)][2]
@@ -364,8 +430,8 @@ def runSimulation():
     loop = True
     while ((not robot.isTempGood()) or (not robot.isHumidGood())):
         # loop = False
-        # if visits == 3:
-        #     break
+        if visits == 0:
+            break
 
 
         # Search for room to change:
@@ -433,16 +499,14 @@ def runSimulation():
                 ' and {:.2f}% humidity ({:.2f} deviation).\n'
                 .format(temp, stdTemp, humid, stdHumid))
 
-        # robot.nextRoom()
-
 
     # Simulation over, print results
-    print('Finished simulation:')
-    robot.floor.printRooms()
+    # print('Finished simulation:')
+    # robot.floor.printRooms()
 
-    print('The average is {:.2f} degrees ({:.2f} deviation)'
-            ' and {:.2f}% humidity ({:.2f} deviation).'
-            .format(temp, stdTemp, humid, stdHumid))
+    # print('The average is {:.2f} degrees ({:.2f} deviation)'
+    #         ' and {:.2f}% humidity ({:.2f} deviation).'
+    #         .format(temp, stdTemp, humid, stdHumid))
 
     return [visits, totalJumps, totalWeights]
 
@@ -467,17 +531,17 @@ def main():
         numJumps.append(totalJumps)
         numWeights.append(totalWeights)
 
-        print('It took {} total visits and used {} total power.'.format(visits, totalWeights))
+        # print('It took {} total visits and used {} total power.'.format(visits, totalWeights))
         print()
 
-    stdDevVisits = calculateStdDev(numVisits)
-    meanVisits = sum(numVisits)/len(numVisits)
+    # stdDevVisits = calculateStdDev(numVisits)
+    # meanVisits = sum(numVisits)/len(numVisits)
 
-    stdDevPower = calculateStdDev(numWeights)
-    meanPower = sum(numWeights)/len(numWeights)
-    print('Overall, it took an average of {} visits ({:.2f} deviation)\n'
-            'and an average of {} power ({:.2f} deviation).\n'
-            .format(meanVisits, stdDevVisits, meanPower, stdDevPower))
+    # stdDevPower = calculateStdDev(numWeights)
+    # meanPower = sum(numWeights)/len(numWeights)
+    # print('Overall, it took an average of {} visits ({:.2f} deviation)\n'
+    #         'and an average of {} power ({:.2f} deviation).\n'
+    #         .format(meanVisits, stdDevVisits, meanPower, stdDevPower))
 
 
 
