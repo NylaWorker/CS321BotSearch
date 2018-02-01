@@ -10,19 +10,17 @@ from collections import deque
 import re
 import csv
 
+heuristic = []  # Global heuristic list for each run of simulation
+
 
 class Node:
     def __init__(self, office):
         self.office = office
         self.edges = []
-        # [4, 7]
         self.weights = []
-        # [10, 9]
 
     def __eq__(self, other):
         return self.office == other.office
-
-        # Used for finding the collision chain for this node.
 
     def __hash__(self):
         return self.office
@@ -128,33 +126,6 @@ class Graph:
                 if curNode not in visited:
                     stack.append(curNode)
         return result
-
-def findHeuristicWeight(curRoom, goalroom,  heuristic):
-    i= 0
-    if goalroom == curRoom:
-        print("ERROR: Goal room should not equal Current Room")
-        return
-    while heuristic[11*i][0] != curRoom:
-        i+=1
-    if goalroom > curRoom:
-        return heuristic[11*i:11*i+11][goalroom-2][2] #Returns the list
-    else:
-        return heuristic[11 * i:11 * i + 11][goalroom - 1][2]
-    # def Astar(self, heuristic, startRoom, goalRoom):
-    #     if not self.nodes[startRoom]:
-    #         return []
-    #     start = self.nodes[startRoom]
-    #     visited = set() #[start])
-    #     queue = deque([start])
-    #     result = []
-    #     path = []
-    #     pathWeights = []
-    #
-    #     for i in range(13):
-    #         path.append(0)
-    #         pathWeights.append(0)
-    #     path[startRoom] = -1
-    #     while a
 
 
 class Floor(object):
@@ -276,7 +247,8 @@ class Robot(object):
 
     def isTempGood(self):
         avg = self.floor.getAvgTemperature()
-        dev = math.floor(self.floor.getStdDevTemperature()*10)/10    # Round to tenths place
+        # Round to tenths place
+        dev = math.floor(self.floor.getStdDevTemperature()*10)/10
         if ((self.GoalTemp <= avg < self.GoalTemp + 1) and dev <= self.TempDev):
             return True
         else:
@@ -284,7 +256,8 @@ class Robot(object):
 
     def isHumidGood(self):
         avg = self.floor.getAvgHumidity()
-        dev = math.floor(self.floor.getStdDevHumidity()*100)/100     # Round to hundredths place
+        # Round to hundredths place
+        dev = math.floor(self.floor.getStdDevHumidity()*100)/100
         if ((self.GoalHumid <= avg < self.GoalHumid + 1) and dev <= self.HumidDev):
             return True
         else:
@@ -337,6 +310,44 @@ def calculateStdDev(array):
     stdDev = math.sqrt(variance)
 
     return stdDev
+
+def findHeuristicWeight(curRoom, goalRoom,  heuristic):
+    if goalRoom == curRoom:
+        print("ERROR: Goal room should not equal current room")
+    else:
+        #               find curRoom    then go to goalRoom     and adjust for offset
+        return heuristic[(curRoom-1)*11 + goalRoom - (2 if goalRoom > curRoom else 1)][2]
+
+    # testList = heuristic[(curRoom-1)*11 + goalRoom - (2 if goalRoom > curRoom else 1)][2]
+    # print(testList)
+    # print('true' if 1 else 'false') # 'true' if True else 'false'
+    # return testList
+    # i = 0
+    # if goalRoom == curRoom:
+    #     print("ERROR: Goal room should not equal Current Room")
+    #     return
+    # while heuristic[11*i][0] != curRoom:
+    #     i+=1
+    # if goalRoom > curRoom:
+    #     return heuristic[11*i:11*i+11][goalRoom-2][2] #Returns the list
+    # else:
+    #     return heuristic[11 * i:11 * i + 11][goalRoom - 1][2]
+
+    # def Astar(self, heuristic, startRoom, goalRoom):
+    #     if not self.nodes[startRoom]:
+    #         return []
+    #     start = self.nodes[startRoom]
+    #     visited = set() #[start])
+    #     queue = deque([start])
+    #     result = []
+    #     path = []
+    #     pathWeights = []
+    #
+    #     for i in range(13):
+    #         path.append(0)
+    #         pathWeights.append(0)
+    #     path[startRoom] = -1
+    #     while a
 
 def runSimulation():
 
@@ -397,7 +408,8 @@ def runSimulation():
         humidDelta = abs(robot.GoalHumid - robot.floor.getHumidity(room))
 
         print('Office {}: {} degrees, {}% humidity'
-                .format(room, robot.floor.getTemperature(room), robot.floor.getHumidity(room)))
+                .format(room, robot.floor.getTemperature(room), 
+                              robot.floor.getHumidity(room)))
 
         if (robot.isTempGood()):
             robot.changeHumid(room)
@@ -409,7 +421,8 @@ def runSimulation():
             robot.changeTemp(room)
 
         print('Office {}: {} degrees, {}% humidity'
-                .format(room, robot.floor.getTemperature(room), robot.floor.getHumidity(room)))
+                .format(room, robot.floor.getTemperature(room), 
+                              robot.floor.getHumidity(room)))
 
         temp = robot.floor.getAvgTemperature()
         humid = robot.floor.getAvgHumidity()
@@ -435,37 +448,37 @@ def runSimulation():
 
 
 def main():
+
+    with open('HeatMiserHeuristic.txt', 'r') as tsv:
+        heuristicFile = [line.strip().split('\t') for line in tsv]
+
+        for i in range(1, len(heuristicFile)):
+            heuristic.append(list(map(int,list(filter(None, heuristicFile[i])))))
+        print(findHeuristicWeight(1,11,heuristic))
+
+
     numVisits = []
     numJumps = []
     numWeights = []
-    for i in range(2):
+    for i in range(1):
         print('Simulation {}:'.format(i+1))
         [visits, totalJumps, totalWeights] = runSimulation()
         numVisits.append(visits)
         numJumps.append(totalJumps)
         numWeights.append(totalWeights)
 
-        print('It took {} total visits.'.format(visits))
+        print('It took {} total visits and used {} total power.'.format(visits, totalWeights))
         print()
 
     stdDevVisits = calculateStdDev(numVisits)
     meanVisits = sum(numVisits)/len(numVisits)
-    print('Overall, it took an average of {} visits ({:.2f} deviation).\n'
-            .format(meanVisits, stdDevVisits))
 
-    heuristic = open("HeatMiserHeuristic.txt","r").read().splitlines(True)
-    #print(heuristic)
+    stdDevPower = calculateStdDev(numWeights)
+    meanPower = sum(numWeights)/len(numWeights)
+    print('Overall, it took an average of {} visits ({:.2f} deviation)\n'
+            'and an average of {} power ({:.2f} deviation).\n'
+            .format(meanVisits, stdDevVisits, meanPower, stdDevPower))
 
-    with open('HeatMiserHeuristic.txt', 'r') as tsv:
-        heuristic = [line.strip().split('\t') for line in tsv]
-        #print(heuristic)
-        newheuristic = []
-
-        for i in range(len(heuristic)):
-            if i > 0:
-                newheuristic.append(list(map(int,list(filter(None, heuristic[i])))))
-        # newheuristic = newheuristic ##[initial off, end off, straight line distance]
-        print(findHeuristicWeight(5,5,newheuristic))
 
 
 main()
