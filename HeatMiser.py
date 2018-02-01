@@ -129,15 +129,35 @@ class Graph:
                     stack.append(curNode)
         return result
 
-    # def findHeuristic(self, curRoom, goalRoom, heuristic, desiredout = "in"):
-    #     i = 0
-    #     while curRoom != heuristic[11*i][0]:
-    #         print(dog_)
-    #      print(i+1)
+def findHeuristicWeight(curRoom, goalroom,  heuristic):
+    i= 0
+    if goalroom == curRoom:
+        print("ERROR: Goal room should not equal Current Room")
+        return
+    print("This is the huer",heuristic[0])
+    while heuristic[11*i][0] != curRoom:
+        i+=1
+    print(heuristic[11*i:11*i+11][goalroom-1])
+    print(heuristic[11*i:11*i+11])
+    if goalroom > curRoom:
+        return heuristic[11*i:11*i+11][goalroom-2][2] #Returns the list
+    else:
+        return heuristic[11 * i:11 * i + 11][goalroom - 1][2]
+    # def Astar(self, heuristic, startRoom, goalRoom):
+    #     if not self.nodes[startRoom]:
+    #         return []
+    #     start = self.nodes[startRoom]
+    #     visited = set() #[start])
+    #     queue = deque([start])
+    #     result = []
+    #     path = []
+    #     pathWeights = []
     #
-    # # def Astar(self, heuristic, startRoom, goalRoom):
-    # #
-    # #     while a
+    #     for i in range(13):
+    #         path.append(0)
+    #         pathWeights.append(0)
+    #     path[startRoom] = -1
+    #     while a
 
 
 class Floor(object):
@@ -421,7 +441,7 @@ def main():
     numVisits = []
     numJumps = []
     numWeights = []
-    for i in range(100):
+    for i in range(2):
         print('Simulation {}:'.format(i+1))
         [visits, totalJumps, totalWeights] = runSimulation()
         numVisits.append(visits)
@@ -447,8 +467,8 @@ def main():
         for i in range(len(heuristic)):
             if i > 0:
                 newheuristic.append(list(map(int,list(filter(None, heuristic[i])))))
-        newheuristic = newheuristic ##[initial off, end off, straight line distance]
-        print(newheuristic)
+        # newheuristic = newheuristic ##[initial off, end off, straight line distance]
+        print(findHeuristicWeight(5,5,newheuristic))
 
 
 main()
