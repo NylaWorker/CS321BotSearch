@@ -134,11 +134,8 @@ def findHeuristicWeight(curRoom, goalroom,  heuristic):
     if goalroom == curRoom:
         print("ERROR: Goal room should not equal Current Room")
         return
-    print("This is the huer",heuristic[0])
     while heuristic[11*i][0] != curRoom:
         i+=1
-    print(heuristic[11*i:11*i+11][goalroom-1])
-    print(heuristic[11*i:11*i+11])
     if goalroom > curRoom:
         return heuristic[11*i:11*i+11][goalroom-2][2] #Returns the list
     else:
