@@ -245,11 +245,11 @@ class Floor(object):
         if (self.RoomHumid[room-1] > self.minHumid):
             self.RoomHumid[room-1] = self.RoomHumid[room-1] - 1
 
-    def setTemp(self, room):
-        self.RoomTemps[room - 1] = 72
+    def setTemp(self, room, val):
+        self.RoomTemps[room - 1] = val
 
-    def setHumid(self, room):
-        self.RoomHumid[room - 1] = 47
+    def setHumid(self, room,val):
+        self.RoomHumid[room - 1] = val
 
 
 class Robot(object):
@@ -286,40 +286,40 @@ class Robot(object):
         else:
             return False
 
-    def changeTemp(self, room):
-        self.floor.setTemp(room)
-        # if (self.floor.getStdDevTemperature() > self.TempDev):
-        #     if (self.floor.getTemperature(room) <= self.GoalTemp):
-        #         self.floor.setTemp(room)
-        #         print('Increasing temperature.')
-        #     else:
-        #         self.floor.setTemp(room)
-        #         print('Decreasing temperature.')
-        # else:
-        #     if (self.floor.getAvgTemperature() <= self.GoalTemp):
-        #         self.floor.setTemp(room)
-        #         print('Increasing temperature.')
-        #     else:
-        #         self.floor.setTemp(room)
-        #         print('Decreasing temperature.')
+    def changeTemp(self, room, tem):
+        # oldTemp = tem
+        avg = self.floor.getAvgTemperature()
+        # std = self.floor.getStdDevTemperature()
+        # oldAveDif = abs(self.floor.getAvgTemperature() - 72)
+        if(self.floor.getStdDevTemperature()<1.5 - 4/12):
+            if(avg > 72):
+                self.floor.setTemp(room, 71)
+            elif(avg < 72):
+                self.floor.setTemp(room, 73)
+        elif (self.floor.getStdDevTemperature()<1.5 - 9/12):
+            if (avg > 72):
+                self.floor.setTemp(room, 70)
+            elif (avg < 72):
+                self.floor.setTemp(room, 74)
+        else:
+            self.floor.setTemp(room, 72)
+        # self.floor.setTemp(room, 72)
 
-
-    def changeHumid(self, room):
-        self.floor.setHumid(room)
-    #     if (self.floor.getStdDevHumidity() > self.HumidDev):
-    #         if (self.floor.getHumidity(room) < self.GoalHumid):
-    #             self.floor.setHumid(room)
-    #             print('Increasing humidity.')
-    #         else:
-    #             self.floor.setHumid(room)
-    #             print('Decreasing humidity.')
-    #     else:
-    #         if (self.floor.getAvgHumidity() < self.GoalHumid):
-    #             self.floor.setHumid(room)
-    #             print('Increasing humidity.')
-    #         else:
-    #             self.floor.setHumid(room)
-    #             print('Decreasing humidity.')
+    def changeHumid(self, room, hum):
+        avg = self.floor.getAvgHumidity()
+        self.floor.setHumid(room, 47)
+        if (self.floor.getStdDevHumidity() < 1.7 - 4 / 12):
+            if (avg > 47):
+                self.floor.setHumid(room, 46)
+            elif (avg < 47):
+                self.floor.setHumid(room, 48)
+        elif (self.floor.getStdDevTemperature() < 1.7 - 9/12):
+            if (avg > 47):
+                self.floor.setHumid(room, 45)
+            elif (avg < 47):
+                self.floor.setHumid(room, 49)
+        else:
+            self.floor.setHumid(room, 47)
 
 
 def calculateStdDev(array):
@@ -403,13 +403,13 @@ def runSimulation():
                               robot.floor.getHumidity(room)))
 
         if (robot.isTempGood()):
-            robot.changeHumid(room)
+            robot.changeHumid(room,robot.floor.RoomTemps[room-1])
         elif (robot.isHumidGood()):
-            robot.changeTemp(room)
+            robot.changeTemp(room,robot.floor.RoomHumid[room-1])
         elif (humidDelta > tempDelta):
-            robot.changeHumid(room)
+            robot.changeHumid(room,robot.floor.RoomHumid[room-1])
         else:
-            robot.changeTemp(room)
+            robot.changeTemp(room,robot.floor.RoomTemps[room-1])
 
         print('Office {}: {} degrees, {}% humidity'
                 .format(room, robot.floor.getTemperature(room), 
