@@ -1,5 +1,4 @@
-# @Martin Green
-# @Nyla Worker
+# @Anonymous
 # HeatMiser.py
 # AI HW 2
 # Winter 2018
@@ -99,7 +98,7 @@ class Graph:
 
         while not pathFound:
             if curRoom == startRoom:
-                pathFound = True;
+                pathFound = True
             else:
                 pathWeight += pathWeights[curRoom]
                 numJumps += 1
@@ -144,7 +143,7 @@ class Graph:
 
         while not pathFound:
             if curRoom == startRoom:
-                pathFound = True;
+                pathFound = True
             else:
                 numJumps += 1
                 curRoom = cameFrom[curRoom]
@@ -323,8 +322,8 @@ def findHeuristicWeight(curRoom, goalRoom):
 def runSimulation(type):
     robot = Robot()
 
-    temp  = 0; stdTemp  = 0;
-    humid = 0; stdHumid = 0;
+    temp  = 0; stdTemp  = 0
+    humid = 0; stdHumid = 0
     visits = 0
     totalJumps = 0
     totalWeights = 0
