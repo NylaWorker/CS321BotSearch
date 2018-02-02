@@ -35,6 +35,9 @@ class Node:
     def __eq__(self, other):
         return self.office == other.office
 
+    def __lt__(self, other):
+        return self.office < other.office
+
     def __hash__(self):
         return self.office
 
@@ -59,9 +62,10 @@ class Graph:
 
     def bfs(self, startRoom, goalRoom):
         if not self.nodes[startRoom]:
-            return []
+            return [0, 0]   # Error
+
         start = self.nodes[startRoom]
-        visited = set() #[start])
+        visited = set()
         queue = deque([start])
         result = []
         path = []
@@ -78,6 +82,7 @@ class Graph:
             if node not in visited:
                 result.append(node)
                 visited.add(node)
+
                 for i in range(len(node.edges)):
                     curNode = node.edges[i]
                     if curNode not in visited:
@@ -86,6 +91,7 @@ class Graph:
                             path[curNode.office] = node.office
                             pathWeights[curNode.office] = node.weights[i]
 
+        # Calculate jumps and path cost
         numJumps = 0
         pathWeight = 0
         pathFound = False
@@ -101,66 +107,49 @@ class Graph:
 
         return [numJumps, pathWeight]
 
-    def dfs(self, curRoom, goalRoom):
-        if not self.nodes[curRoom]:
-            return []
-        start = self.nodes[curRoom]
-        visited = set()
-        stack = [start]
-        result = []
-        
-        while stack:
-            node = stack.pop()
-            if node not in visited:
-                result.append(node)
-                visited.add(node)
+    def a_star_search(self, startRoom, goalRoom):
+        if not self.nodes[startRoom]:
+            return [0, 0]   # Error
 
-            for curNode in node.edges:
-                if curNode not in visited:
-                    stack.append(curNode)
-        return result
-
-    def a_star_search(self, startRoom, goal):
         frontier = PriorityQueue()
         start = self.nodes[startRoom]
         frontier.put(start, 0)
+
         came_from = {}
         cost_so_far = {}
-        came_from[start] = 0
-        cost_so_far[start] = 0
+
+        came_from[start.office] = 0
+        cost_so_far[start.office] = 0
         
         while not frontier.empty():
             current = frontier.get()
             
-            if current.office == goal:
+            if current.office == goalRoom:
                 break
 
             for i in range(len(current.edges)):
                 next = current.edges[i]
-                new_cost = cost_so_far[current] + current.weights[i]
-                if next not in cost_so_far or new_cost < cost_so_far[next]:
-                    cost_so_far[next] = new_cost
-                    priority = new_cost + findHeuristicWeight(next.office, goal, heuristic)
+                new_cost = cost_so_far[current.office] + current.weights[i]
+
+                if next.office not in cost_so_far or new_cost < cost_so_far[next.office]:
+                    cost_so_far[next.office] = new_cost
+                    priority = new_cost + findHeuristicWeight(next.office, goalRoom)
                     frontier.put(next, priority)
-                    came_from[next] = current
-        
-        return came_from, cost_so_far
+                    came_from[next.office] = current.office
 
-        # numJumps = 0
-        # pathWeight = 0
-        # pathFound = False
-        # curRoom = goalRoom
+        # Calculate jumps and path cost
+        numJumps = 0
+        pathFound = False
+        curRoom = goalRoom        
 
-        # while not pathFound:
-        #     if curRoom == startRoom:
-        #         pathFound = True;
-        #     else:
-        #         pathWeight += pathWeights[curRoom]
-        #         numJumps += 1
-        #         curRoom = path[curRoom]
+        while not pathFound:
+            if curRoom == startRoom:
+                pathFound = True;
+            else:
+                numJumps += 1
+                curRoom = came_from[curRoom]
 
-        # # print("numVisits:", numJumps, "pathWeight:", pathWeight)
-        # return [numJumps, pathWeight]
+        return [numJumps, cost_so_far[goalRoom]]
 
 
 class Floor(object):
@@ -174,8 +163,6 @@ class Floor(object):
         self.graph = Graph()
         self.initRooms()
         self.initGraph()
-        # self.testGraph()
-
 
     def initRooms(self):
         for i in range(self.Rooms):
@@ -200,10 +187,6 @@ class Floor(object):
         self.graph.addEdge(self.graph.nodes[9],  self.graph.nodes[10], 8)
         self.graph.addEdge(self.graph.nodes[10], self.graph.nodes[11], 2)
         self.graph.addEdge(self.graph.nodes[11], self.graph.nodes[12], 19)
-
-    def testGraph(self):
-        print(self.graph.a_star_search(4, 9))
-
 
     def printRooms(self):
         for i in range(self.Rooms):
@@ -334,30 +317,23 @@ def calculateStdDev(array):
 
     return stdDev
 
-def findHeuristicWeight(curRoom, goalRoom,  heuristic):
+def findHeuristicWeight(curRoom, goalRoom):
     if goalRoom == curRoom:
         return 0
     else:
         return heuristic[(curRoom-1)*11 + goalRoom - (2 if goalRoom > curRoom else 1)][2]
 
-def runSimulation():
 
+def runSimulation(type):
     robot = Robot()
 
     temp  = 0; stdTemp  = 0;
     humid = 0; stdHumid = 0;
     visits = 0
-    # pathJumps = []
-    # pathWeights = []
     totalJumps = 0
     totalWeights = 0
 
-    loop = True
     while ((not robot.isTempGood()) or (not robot.isHumidGood())):
-        # loop = False
-        # if visits == 0:
-        #     break
-
 
         # Search for room to change:
         maxDelta = 0
@@ -374,15 +350,11 @@ def runSimulation():
                     maxDeltaRoom = i+1
 
 
-        # print("curRoom:", robot.curRoom)
-        # print("Room to change:", maxDeltaRoom)
+        if (type):  # A*
+            [numJumps, pathWeight] = robot.floor.graph.a_star_search(robot.curRoom, maxDeltaRoom)
+        else:       # BFS
+            [numJumps, pathWeight] = robot.floor.graph.bfs(robot.curRoom, maxDeltaRoom)
 
-
-
-        [numJumps, pathWeight] = robot.floor.graph.bfs(robot.curRoom, maxDeltaRoom)
-        # print(robot.curRoom, maxDeltaRoom, numJumps, pathWeight)
-        # pathJumps.append(numJumps)
-        # pathWeights.append(pathWeight)
         totalJumps += numJumps
         totalWeights += pathWeight
 
@@ -436,22 +408,13 @@ def runSimulation():
     return [visits, totalJumps, totalWeights]
 
 
-def main():
-
-    with open('HeatMiserHeuristic.txt', 'r') as tsv:
-        heuristicFile = [line.strip().split('\t') for line in tsv]
-
-        for i in range(1, len(heuristicFile)):
-            heuristic.append(list(map(int,list(filter(None, heuristicFile[i])))))
-        # print(findHeuristicWeight(1,11,heuristic))
-
-
+def mainSimulation(runs, type):
     numVisits = []
     numJumps = []
     numWeights = []
-    for i in range(1):
+    for i in range(runs):
         print('Simulation {}:'.format(i+1))
-        [visits, totalJumps, totalWeights] = runSimulation()
+        [visits, totalJumps, totalWeights] = runSimulation(type)
         numVisits.append(visits)
         numJumps.append(totalJumps)
         numWeights.append(totalWeights)
@@ -464,10 +427,33 @@ def main():
 
     stdDevPower = calculateStdDev(numWeights)
     meanPower = sum(numWeights)/len(numWeights)
+
     print('Overall, it took an average of {} visits ({:.2f} deviation)\n'
             'and an average of {} power ({:.2f} deviation).\n'
             .format(meanVisits, stdDevVisits, meanPower, stdDevPower))
 
+
+def main():
+
+    # Load heuristic
+    with open('HeatMiserHeuristic.txt', 'r') as tsv:
+        heuristicFile = [line.strip().split('\t') for line in tsv]
+
+        for i in range(1, len(heuristicFile)):
+            heuristic.append(list(map(int,list(filter(None, heuristicFile[i])))))
+
+
+    numberRuns = 100
+    type = 0    # 0 = BFS, 1 = A*
+
+    # BFS
+    print('\nRunning part A using Bredth First Search\n')
+    mainSimulation(numberRuns, type)
+
+    # # A*
+    print('\nRunning part B using A*\n')
+    type = 1
+    mainSimulation(numberRuns, type)
 
 
 main()
