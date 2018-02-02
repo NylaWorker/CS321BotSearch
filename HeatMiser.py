@@ -340,12 +340,12 @@ def runSimulation(type):
         maxDeltaRoom = 0
         if (not robot.isTempGood()):
             for i in range(len(robot.floor.RoomTemps)):
-                if abs(robot.GoalTemp - robot.floor.RoomTemps[i]) > maxDelta:
+                if abs(robot.GoalTemp+0.5 - robot.floor.RoomTemps[i]) > maxDelta:
                     maxDelta = abs(robot.GoalTemp - robot.floor.RoomTemps[i])
                     maxDeltaRoom = i+1
         if (not robot.isHumidGood()):
             for i in range(len(robot.floor.RoomHumid)):
-                if abs(robot.GoalHumid - robot.floor.RoomHumid[i]) > maxDelta:
+                if abs(robot.GoalHumid+0.5 - robot.floor.RoomHumid[i]) > maxDelta:
                     maxDelta = abs(robot.GoalHumid - robot.floor.RoomHumid[i])
                     maxDeltaRoom = i+1
 
