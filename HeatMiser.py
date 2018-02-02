@@ -256,7 +256,7 @@ class Robot(object):
 
     def __init__(self):
         self.floor = Floor()
-        # self.floor.printRooms()
+        self.floor.printRooms()
 
         self.curRoom = random.randint(1, self.floor.Rooms)
         self.GoalTemp  = 72; self.TempDev  = 1.5
@@ -355,8 +355,8 @@ def runSimulation():
     loop = True
     while ((not robot.isTempGood()) or (not robot.isHumidGood())):
         # loop = False
-        if visits == 0:
-            break
+        # if visits == 0:
+        #     break
 
 
         # Search for room to change:
@@ -426,12 +426,12 @@ def runSimulation():
 
 
     # Simulation over, print results
-    # print('Finished simulation:')
-    # robot.floor.printRooms()
+    print('Finished simulation:')
+    robot.floor.printRooms()
 
-    # print('The average is {:.2f} degrees ({:.2f} deviation)'
-    #         ' and {:.2f}% humidity ({:.2f} deviation).'
-    #         .format(temp, stdTemp, humid, stdHumid))
+    print('The average is {:.2f} degrees ({:.2f} deviation)'
+            ' and {:.2f}% humidity ({:.2f} deviation).'
+            .format(temp, stdTemp, humid, stdHumid))
 
     return [visits, totalJumps, totalWeights]
 
@@ -443,7 +443,7 @@ def main():
 
         for i in range(1, len(heuristicFile)):
             heuristic.append(list(map(int,list(filter(None, heuristicFile[i])))))
-        print(findHeuristicWeight(1,11,heuristic))
+        # print(findHeuristicWeight(1,11,heuristic))
 
 
     numVisits = []
@@ -456,17 +456,17 @@ def main():
         numJumps.append(totalJumps)
         numWeights.append(totalWeights)
 
-        # print('It took {} total visits and used {} total power.'.format(visits, totalWeights))
+        print('It took {} total visits and used {} total power.'.format(visits, totalWeights))
         print()
 
-    # stdDevVisits = calculateStdDev(numVisits)
-    # meanVisits = sum(numVisits)/len(numVisits)
+    stdDevVisits = calculateStdDev(numVisits)
+    meanVisits = sum(numVisits)/len(numVisits)
 
-    # stdDevPower = calculateStdDev(numWeights)
-    # meanPower = sum(numWeights)/len(numWeights)
-    # print('Overall, it took an average of {} visits ({:.2f} deviation)\n'
-    #         'and an average of {} power ({:.2f} deviation).\n'
-    #         .format(meanVisits, stdDevVisits, meanPower, stdDevPower))
+    stdDevPower = calculateStdDev(numWeights)
+    meanPower = sum(numWeights)/len(numWeights)
+    print('Overall, it took an average of {} visits ({:.2f} deviation)\n'
+            'and an average of {} power ({:.2f} deviation).\n'
+            .format(meanVisits, stdDevVisits, meanPower, stdDevPower))
 
 
 
