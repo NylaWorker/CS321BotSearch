@@ -107,7 +107,7 @@ class Graph:
 
         return [numJumps, pathWeight]
 
-    def a_star_search(self, startRoom, goalRoom):
+    def aStarSearch(self, startRoom, goalRoom):
         if not self.nodes[startRoom]:
             return [0, 0]   # Error
 
@@ -115,11 +115,11 @@ class Graph:
         start = self.nodes[startRoom]
         frontier.put(start, 0)
 
-        came_from = {}
-        cost_so_far = {}
+        cameFrom = {}
+        costSoFar = {}
 
-        came_from[start.office] = 0
-        cost_so_far[start.office] = 0
+        cameFrom[start.office] = 0
+        costSoFar[start.office] = 0
         
         while not frontier.empty():
             current = frontier.get()
@@ -129,13 +129,13 @@ class Graph:
 
             for i in range(len(current.edges)):
                 next = current.edges[i]
-                new_cost = cost_so_far[current.office] + current.weights[i]
+                newCost = costSoFar[current.office] + current.weights[i]
 
-                if next.office not in cost_so_far or new_cost < cost_so_far[next.office]:
-                    cost_so_far[next.office] = new_cost
-                    priority = new_cost + findHeuristicWeight(next.office, goalRoom)
+                if next.office not in costSoFar or newCost < costSoFar[next.office]:
+                    costSoFar[next.office] = newCost
+                    priority = newCost + findHeuristicWeight(next.office, goalRoom)
                     frontier.put(next, priority)
-                    came_from[next.office] = current.office
+                    cameFrom[next.office] = current.office
 
         # Calculate jumps and path cost
         numJumps = 0
@@ -147,9 +147,9 @@ class Graph:
                 pathFound = True;
             else:
                 numJumps += 1
-                curRoom = came_from[curRoom]
+                curRoom = cameFrom[curRoom]
 
-        return [numJumps, cost_so_far[goalRoom]]
+        return [numJumps, costSoFar[goalRoom]]
 
 
 class Floor(object):
@@ -270,10 +270,7 @@ class Robot(object):
             return False
 
     def changeTemp(self, room, tem):
-        # oldTemp = tem
         avg = self.floor.getAvgTemperature()
-        # std = self.floor.getStdDevTemperature()
-        # oldAveDif = abs(self.floor.getAvgTemperature() - 72)
         if(self.floor.getStdDevTemperature()<1.5 - 4/12):
             if(avg > 72):
                 self.floor.setTemp(room, 71)
@@ -286,7 +283,6 @@ class Robot(object):
                 self.floor.setTemp(room, 74)
         else:
             self.floor.setTemp(room, 72)
-        # self.floor.setTemp(room, 72)
 
     def changeHumid(self, room, hum):
         avg = self.floor.getAvgHumidity()
@@ -306,13 +302,13 @@ class Robot(object):
 
 
 def calculateStdDev(array):
-    num_items = len(array)
-    mean = sum(array)/num_items
+    numItems = len(array)
+    mean = sum(array)/numItems
     differences = [x - mean for x in array]
-    sq_differences = [d ** 2 for d in differences]
-    ssd = sum(sq_differences)
+    sqDifferences = [d ** 2 for d in differences]
+    ssd = sum(sqDifferences)
 
-    variance = ssd / num_items
+    variance = ssd / numItems
     stdDev = math.sqrt(variance)
 
     return stdDev
@@ -351,7 +347,7 @@ def runSimulation(type):
 
 
         if (type):  # A*
-            [numJumps, pathWeight] = robot.floor.graph.a_star_search(robot.curRoom, maxDeltaRoom)
+            [numJumps, pathWeight] = robot.floor.graph.aStarSearch(robot.curRoom, maxDeltaRoom)
         else:       # BFS
             [numJumps, pathWeight] = robot.floor.graph.bfs(robot.curRoom, maxDeltaRoom)
 
@@ -375,12 +371,16 @@ def runSimulation(type):
                               robot.floor.getHumidity(room)))
 
         if (robot.isTempGood()):
+            # print('Changing humidity.')
             robot.changeHumid(room,robot.floor.RoomTemps[room-1])
         elif (robot.isHumidGood()):
+            # print('Changing temperature.')
             robot.changeTemp(room,robot.floor.RoomHumid[room-1])
         elif (humidDelta > tempDelta):
+            # print('Changing humidity.')
             robot.changeHumid(room,robot.floor.RoomHumid[room-1])
         else:
+            # print('Changing temperature.')
             robot.changeTemp(room,robot.floor.RoomTemps[room-1])
 
         print('Office {}: {} degrees, {}% humidity'
@@ -419,16 +419,16 @@ def mainSimulation(runs, type):
         numJumps.append(totalJumps)
         numWeights.append(totalWeights)
 
-        print('It took {} total visits and used {} total power.'.format(visits, totalWeights))
+        print('It took {} total office visits and used {} total power.'.format(totalJumps, totalWeights))
         print()
 
-    stdDevVisits = calculateStdDev(numVisits)
-    meanVisits = sum(numVisits)/len(numVisits)
+    stdDevVisits = calculateStdDev(numJumps)
+    meanVisits = sum(numJumps)/len(numJumps)
 
     stdDevPower = calculateStdDev(numWeights)
     meanPower = sum(numWeights)/len(numWeights)
 
-    print('Overall, it took an average of {} visits ({:.2f} deviation)\n'
+    print('Overall, it took an average of {} office visits ({:.2f} deviation)\n'
             'and an average of {} power ({:.2f} deviation).\n'
             .format(meanVisits, stdDevVisits, meanPower, stdDevPower))
 
