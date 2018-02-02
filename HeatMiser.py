@@ -313,7 +313,7 @@ class Robot(object):
                 self.floor.setHumid(room, 46)
             elif (avg < 47):
                 self.floor.setHumid(room, 48)
-        elif (self.floor.getStdDevTemperature() < 1.7 - 9/12):
+        elif (self.floor.getStdDevHumidity() < 1.7 - 9/12):
             if (avg > 47):
                 self.floor.setHumid(room, 45)
             elif (avg < 47):
