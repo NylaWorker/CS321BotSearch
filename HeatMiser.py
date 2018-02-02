@@ -9,10 +9,9 @@ import math
 from collections import deque
 import re
 import csv
+import heapq
 
 heuristic = []  # Global heuristic list for each run of simulation
-
-import heapq
 
 class PriorityQueue:
     def __init__(self):
@@ -38,9 +37,6 @@ class Node:
 
     def __hash__(self):
         return self.office
-
-    # def __str__(self):
-    #     return str(self.office)
 
     def __repr__(self):
         return str(self.office)
@@ -76,31 +72,19 @@ class Graph:
             pathWeights.append(0)
         path[startRoom] = -1
 
-        # print([room for room in path])
 
         while queue:
-            # print("Next round:")
             node = queue.popleft()
             if node not in visited:
                 result.append(node)
                 visited.add(node)
-                # result.append(node)
-                # for curNode in node.edges:
                 for i in range(len(node.edges)):
                     curNode = node.edges[i]
-                    # print("Testing:", curNode)
                     if curNode not in visited:
                         queue.append(curNode)
                         if path[curNode.office] == 0:
                             path[curNode.office] = node.office
                             pathWeights[curNode.office] = node.weights[i]
-                        # print("Adding:", curNode, "child of", node.office)
-                        # visited.add(curNode)
-
-        # testGraph
-        # path
-        # print([room for room in path])
-        # print([weight for weight in pathWeights])
 
         numJumps = 0
         pathWeight = 0
@@ -115,26 +99,21 @@ class Graph:
                 numJumps += 1
                 curRoom = path[curRoom]
 
-        # print("numVisits:", numJumps, "pathWeight:", pathWeight)
         return [numJumps, pathWeight]
-        # return result
 
     def dfs(self, curRoom, goalRoom):
         if not self.nodes[curRoom]:
             return []
         start = self.nodes[curRoom]
-        visited = set() #[start])
+        visited = set()
         stack = [start]
         result = []
         
         while stack:
-            # print("Stack:", [office.office for office in stack])
-            # print("Visited:", [office.office for office in visited])
             node = stack.pop()
             if node not in visited:
                 result.append(node)
                 visited.add(node)
-            # print("Cur node:", node) # [edge.office for edge in node.edges]
 
             for curNode in node.edges:
                 if curNode not in visited:
@@ -155,19 +134,12 @@ class Graph:
             
             if current.office == goal:
                 break
-            
-                    # for i in range(len(node.edges)):
-                        # curNode = node.edges[i]
-            # for next in graph.neighbors(current):
-            # for next in current.edges:
+
             for i in range(len(current.edges)):
                 next = current.edges[i]
-                # new_cost = cost_so_far[current] + graph.cost(current, next)
                 new_cost = cost_so_far[current] + current.weights[i]
                 if next not in cost_so_far or new_cost < cost_so_far[next]:
                     cost_so_far[next] = new_cost
-                    # print(current, next, goal)
-                    # print(type(current), type(next), type(goal))
                     priority = new_cost + findHeuristicWeight(next.office, goal, heuristic)
                     frontier.put(next, priority)
                     came_from[next] = current
@@ -202,7 +174,7 @@ class Floor(object):
         self.graph = Graph()
         self.initRooms()
         self.initGraph()
-        self.testGraph()
+        # self.testGraph()
 
 
     def initRooms(self):
@@ -230,20 +202,6 @@ class Floor(object):
         self.graph.addEdge(self.graph.nodes[11], self.graph.nodes[12], 19)
 
     def testGraph(self):
-        # result = self.graph.bfs(3, 9)
-        # print(type(result))
-        # print([x for x in result])
-
-        # for node in self.graph.nodes:
-        #     print(node.office, ": ", [edge.office for edge in node.edges])
-
-
-        # result = self.graph.dfs(3, 9)
-        # print(type(result))
-        # print([x for x in result])
-        # for x in result:
-        #     print(x.office)
-
         print(self.graph.a_star_search(4, 9))
 
 
@@ -379,41 +337,8 @@ def calculateStdDev(array):
 def findHeuristicWeight(curRoom, goalRoom,  heuristic):
     if goalRoom == curRoom:
         return 0
-        # print("ERROR: Goal room should not equal current room")
     else:
-        #               find curRoom    then go to goalRoom     and adjust for offset
         return heuristic[(curRoom-1)*11 + goalRoom - (2 if goalRoom > curRoom else 1)][2]
-
-    # testList = heuristic[(curRoom-1)*11 + goalRoom - (2 if goalRoom > curRoom else 1)][2]
-    # print(testList)
-    # print('true' if 1 else 'false') # 'true' if True else 'false'
-    # return testList
-    # i = 0
-    # if goalRoom == curRoom:
-    #     print("ERROR: Goal room should not equal Current Room")
-    #     return
-    # while heuristic[11*i][0] != curRoom:
-    #     i+=1
-    # if goalRoom > curRoom:
-    #     return heuristic[11*i:11*i+11][goalRoom-2][2] #Returns the list
-    # else:
-    #     return heuristic[11 * i:11 * i + 11][goalRoom - 1][2]
-
-    # def Astar(self, heuristic, startRoom, goalRoom):
-    #     if not self.nodes[startRoom]:
-    #         return []
-    #     start = self.nodes[startRoom]
-    #     visited = set() #[start])
-    #     queue = deque([start])
-    #     result = []
-    #     path = []
-    #     pathWeights = []
-    #
-    #     for i in range(13):
-    #         path.append(0)
-    #         pathWeights.append(0)
-    #     path[startRoom] = -1
-    #     while a
 
 def runSimulation():
 
