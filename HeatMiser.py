@@ -6,7 +6,6 @@
 import random
 import math
 from collections import deque
-import re
 import csv
 import heapq
 
