@@ -14,13 +14,13 @@ heuristic = []  # Global heuristic list for each run of simulation
 class PriorityQueue:
     def __init__(self):
         self.elements = []
-    
+
     def empty(self):
         return len(self.elements) == 0
-    
+
     def put(self, item, priority):
         heapq.heappush(self.elements, (priority, item))
-    
+
     def get(self):
         return heapq.heappop(self.elements)[1]
 
@@ -118,10 +118,10 @@ class Graph:
 
         cameFrom[start.office] = 0
         costSoFar[start.office] = 0
-        
+
         while not frontier.empty():
             current = frontier.get()
-            
+
             if current.office == goalRoom:
                 break
 
@@ -138,7 +138,7 @@ class Graph:
         # Calculate jumps and path cost
         numJumps = 0
         pathFound = False
-        curRoom = goalRoom        
+        curRoom = goalRoom
 
         while not pathFound:
             if curRoom == startRoom:
@@ -359,37 +359,33 @@ def runSimulation(type):
         room = maxDeltaRoom
         visits += 1
 
-        
+
         # Figure out which factor to change
         tempDelta = abs(robot.GoalTemp - robot.floor.getTemperature(room))
         humidDelta = abs(robot.GoalHumid - robot.floor.getHumidity(room))
 
         print('Office {}: {} degrees, {}% humidity'
-                .format(room, robot.floor.getTemperature(room), 
+                .format(room, robot.floor.getTemperature(room),
                               robot.floor.getHumidity(room)))
 
         if (robot.isTempGood()):
-            # print('Changing humidity.')
             robot.changeHumid(room,robot.floor.RoomTemps[room-1])
         elif (robot.isHumidGood()):
-            # print('Changing temperature.')
             robot.changeTemp(room,robot.floor.RoomHumid[room-1])
         elif (humidDelta > tempDelta):
-            # print('Changing humidity.')
             robot.changeHumid(room,robot.floor.RoomHumid[room-1])
         else:
-            # print('Changing temperature.')
             robot.changeTemp(room,robot.floor.RoomTemps[room-1])
 
         print('Office {}: {} degrees, {}% humidity'
-                .format(room, robot.floor.getTemperature(room), 
+                .format(room, robot.floor.getTemperature(room),
                               robot.floor.getHumidity(room)))
 
         temp = robot.floor.getAvgTemperature()
         humid = robot.floor.getAvgHumidity()
         stdTemp = robot.floor.getStdDevTemperature()
         stdHumid = robot.floor.getStdDevHumidity()
-        
+
         print('The average is {:.2f} degrees ({:.2f} deviation)'
                 ' and {:.2f}% humidity ({:.2f} deviation).\n'
                 .format(temp, stdTemp, humid, stdHumid))
